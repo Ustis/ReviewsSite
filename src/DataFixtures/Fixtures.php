@@ -24,9 +24,6 @@ class Fixtures extends Fixture implements ContainerAwareInterface
 
     public function load($manager)
     {
-        // $product = new Product();
-        // $manager->persist($product);
-
         $user = new User();
 
         $user->setEmail('user@mail.com');
