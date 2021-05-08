@@ -14,6 +14,7 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
         return parent::index();
+        //TODO Админ панель пункт 4 что имеется в виду
     }
 
     public function configureDashboard(): Dashboard
