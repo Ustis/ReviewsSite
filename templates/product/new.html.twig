@@ -3,9 +3,14 @@
 {% block title %}New Product{% endblock %}
 
 {% block body %}
-    <h1>Create new Product</h1>
+    <div class="col-md-8 mx-auto">
+        <button type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</button>
 
-    {{ include('product/_form.html.twig') }}
+        {{ include('product/_form.html.twig') }}
 
-    <a href="{{ path('product_index') }}">back to list</a>
+        <a href="{{ path('product_index') }}">back to list</a>
+    </div>
+
+
+
 {% endblock %}
