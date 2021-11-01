@@ -3,9 +3,9 @@
 {% block title %}New Comment{% endblock %}
 
 {% block body %}
-    <h1>Create new Comment</h1>
+    <h1>Cоздание коментария</h1>
 
     {{ include('comment/_form.html.twig') }}
 
-    <a href="{{ path('comment_index') }}">back to list</a>
+    <a class="btn btn-success" href="{{ path('product_index') }}">Вернуться к списку продуктов</a>
 {% endblock %}

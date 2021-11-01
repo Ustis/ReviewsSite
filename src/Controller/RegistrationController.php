@@ -34,6 +34,9 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            $user->setInfo('');
+            $user->setImage('D:\Dev\php\ReviewsSite\public\uploads\profileImages\ReviewSitePhoto.jpg');
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();

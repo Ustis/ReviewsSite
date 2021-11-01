@@ -44,6 +44,16 @@ class User implements UserInterface
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="string", length=512)
+     */
+    private $info;
+
+    /**
+     * @ORM\Column(type="string", length=512)
+     */
+    private $image;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -156,6 +166,30 @@ class User implements UserInterface
                 $comment->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getInfo(): ?string
+    {
+        return $this->info;
+    }
+
+    public function setInfo(string $info): self
+    {
+        $this->info = $info;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

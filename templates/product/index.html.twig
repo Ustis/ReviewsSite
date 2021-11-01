@@ -3,22 +3,21 @@
 {% block title %}Product index{% endblock %}
 
 {% block body %}
-    <div class="col-md-8 mx-auto">
-        <button type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</button>
+    <a type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</a>
 
-        {% for product in products %}
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">{{ product.name }}</h4>
-                    <p class="card-text">{{ product.description }}</p>
-                    <p class="card-text">{{ product.addedDate ? product.addedDate|date('Y-m-d H:i:s') : '' }}</p>
-                    <a href="#" class="card-link">Смотреть коментарии</a>
-                </div>
+    {% for product in products %}
+        <div class="card" href="{{ path('product_show', {'id': product.id}) }}" >
+            <div class="card-body">
+                <h4 class="card-title">{{ product.name }}</h4>
+                <p class="card-text">{{ product.description }}</p>
+                <p class="card-text">{{ product.addedDate ? product.addedDate|date('Y-m-d H:i:s') : '' }}</p>
+                <a href="{{ path('comment_show', {'id': product.id}) }}" class="card-link">Смотреть коментарии</a>
             </div>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+{#    {% else %}#}
+{#        <tr>#}
+{#            <td colspan="5">Продукты пока не добавлены</td>#}
+{#        </tr>#}
+
 {% endblock %}

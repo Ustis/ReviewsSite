@@ -3,22 +3,18 @@
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-    <div class="col-md-8 mx-auto">
-        <button type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</button>
 
-        {% for product in products %}
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">{{ product.name }}</h4>
-                    <p class="card-text">{{ product.description }}</p>
-                    <p class="card-text">{{ product.addedDate ? product.addedDate|date('Y-m-d H:i:s') : '' }}</p>
-                    <a href="#" class="card-link">Смотреть коментарии</a>
-                </div>
-            </div>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-    </div>
+    <h4>Имя пользователя: {{ user.email }}</h4>
+
+    <p>О пользователе: {{ user.info }}</p>
+
+    <p>Роли:
+    {% for role in user.roles %}
+        {{ role }}
+    {% endfor %}
+    </p>
+
+    <a href="{{ path('profile_change_password') }}" class="btn btn-success">Изменить пароль</a>
+    <a href="{{ path('profile_change_info') }}" class="btn btn-success">Изменить информацию о пользователе</a>
+    <a href="{{ path('profile_change_photo') }}" class="btn btn-success">Изменить фото профиля</a>
 {% endblock %}

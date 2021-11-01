@@ -3,28 +3,65 @@
 {% block title %}Comment{% endblock %}
 
 {% block body %}
-    <h1>Comment</h1>
+    <h1>Коментарии</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ comment.id }}</td>
-            </tr>
-            <tr>
-                <th>AddedDate</th>
-                <td>{{ comment.addedDate ? comment.addedDate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Text</th>
-                <td>{{ comment.text }}</td>
-            </tr>
-        </tbody>
-    </table>
+    {% if exist == true %}
+        {% for commentWithUser in commentsWithUsers %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="card-text">Имя пользователя: {{ commentWithUser.creator }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="{{ asset('uploads/profileImages/' ~ commentWithUser.creatorImage) }}"
+                                 class="rounded mx-auto d-block" width="40" height="40"/></img>
+                        </div>
+                    </div>
+                    <h4 class="card-title">Текст коментария: {{ commentWithUser.text }}</h4>
+                    <p class="card-text">Дата
+                        добавления: {{ commentWithUser.addedDate ? commentWithUser.addedDate|date('Y-m-d H:i:s') : '' }}</p>
+                </div>
+            </div>
 
-    <a href="{{ path('comment_index') }}">back to list</a>
+            {# <div class="card"> #}
+            {# <div class="card-body"> #}
+            {# <h4 class="card-title">{{ comment.text }}</h4> #}
+            {# <p class="card-text">{{ comment.addedDate ? comment.addedDate|date('Y-m-d H:i:s') : '' }}</p> #}
+            {# </div> #}
+            {# </div> #}
+        {% endfor %}
 
-    <a href="{{ path('comment_edit', {'id': comment.id}) }}">edit</a>
+        {# <table class="table"> #}
+        {# <tbody> #}
+        {# <tr> #}
+        {# <th>Id</th> #}
+        {# <td>{{ comment.id }}</td> #}
+        {# </tr> #}
+        {# <tr> #}
+        {# <th>AddedDate</th> #}
+        {# <td>{{ comment.addedDate ? comment.addedDate|date('Y-m-d H:i:s') : '' }}</td> #}
+        {# </tr> #}
+        {# <tr> #}
+        {# <th>Text</th> #}
+        {# <td>{{ comment.text }}</td> #}
+        {# </tr> #}
+        {# </tbody> #}
+        {# </table> #}
 
-    {{ include('comment/_delete_form.html.twig') }}
+    {% endif %}
+
+    {% if exist == false %}
+
+        <h2>Коментарии не добавлены</h2>
+
+    {% endif %}
+
+    <a class="btn btn-success" href="{{ path('product_index') }}">Вернуться к списку продуктов</a>
+
+    <a class="btn btn-success" href="{{ path('comment_new', {'productId': productId}) }}">Добавить коментарий</a>
+
+    {# <a href="{{ path('comment_edit', {'id': comment.id}) }}">edit</a> #}
+
+    {# {{ include('comment/_delete_form.html.twig') }} #}
 {% endblock %}

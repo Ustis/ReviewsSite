@@ -4,11 +4,11 @@
 
 {% block body %}
     <div class="col-md-8 mx-auto">
-        <button type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</button>
+{#        <button type="button" class="btn btn-primary btn-block" href="{{ path('product_new') }}">Добавить продукт</button>#}
 
         {{ include('product/_form.html.twig') }}
 
-        <a href="{{ path('product_index') }}">back to list</a>
+        <a class="btn btn-success" href="{{ path('product_index') }}">Вернуться к списку продкутов</a>
     </div>
 
 
