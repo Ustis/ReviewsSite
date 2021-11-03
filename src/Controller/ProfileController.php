@@ -5,15 +5,12 @@ namespace App\Controller;
 use App\dto\ImageDto;
 use App\dto\PasswordDto;
 use App\dto\ProfileInfoDto;
-use App\Entity\Product;
 use App\Entity\User;
-use App\Form\ChangePasswordType;
-use App\Form\ProductType;
-use PhpParser\Node\Scalar\MagicConst\File;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,13 +19,13 @@ use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Service\FileUpLoader;
 
 #[Route('/profile')]
 class ProfileController extends AbstractController
 {
     #[Route('/', name: 'profile')]
-    public function index(): Response
+    public function index(NotifierInterface $notifier): Response
     {
         $user = $this->getDoctrine()
             ->getRepository(User::class)
@@ -45,8 +42,6 @@ class ProfileController extends AbstractController
         $password = new PasswordDto();
         $form = $this->createFormBuilder($password)
             ->add('password', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
@@ -55,15 +50,12 @@ class ProfileController extends AbstractController
                     new Length([
                         'min' => 6,
                         'minMessage' => 'Пароль должен содержать минимум {{ limit }} символов',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
                 ],
                 'label' => 'Пароль'
             ])
             ->add('repeatPassword', PasswordType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
                 'constraints' => [
                     new NotBlank([
@@ -72,7 +64,6 @@ class ProfileController extends AbstractController
                     new Length([
                         'min' => 6,
                         'minMessage' => 'Пароль должен содержать минимум {{ limit }} символов',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
                 ],
@@ -86,19 +77,20 @@ class ProfileController extends AbstractController
                 ->getRepository(User::class)
                 ->findOneBy(['email' => $this->getUser()->getUsername()]);
 
-            if ($form->get('password') != $form->get('repeatPassword'))
+            if ($form->get('password')->getData() !== $form->get('repeatPassword')->getData())
                 $notifier->send(new Notification('Пароли не совпадают', ['browser']));
+            else{
+                $user->setPassword(
+                    $passwordEncoder->encodePassword(
+                        $user,
+                        $form->get('password')->getData()
+                    )
+                );
 
-            $user->setPassword(
-                $passwordEncoder->encodePassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($user);
+                $entityManager->flush();
+            }
         }
 
         return $this->render('profile/change.html.twig', [
@@ -107,7 +99,7 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/changeInfo', name: 'profile_change_info', methods: ['GET', 'POST'])]
-    public function changeProfileInfo(Request $request): Response
+    public function changeProfileInfo(Request $request, NotifierInterface $notifier): Response
     {
         $info = new ProfileInfoDto();
         $form = $this->createFormBuilder($info)
@@ -118,7 +110,7 @@ class ProfileController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getDoctrine()
                 ->getRepository(User::class)
                 ->findOneBy(['email' => $this->getUser()->getUsername()]);
@@ -136,7 +128,7 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/changePhoto', name: 'profile_change_photo', methods: ['GET', 'POST'])]
-    public function changePhoto(Request $request, SluggerInterface $slugger): Response
+    public function changePhoto(Request $request, NotifierInterface $notifier, FileUploader $fileUploader): Response
     {
         $imageDto = new ImageDto();
         $form = $this->createFormBuilder($imageDto)
@@ -145,10 +137,7 @@ class ProfileController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-
-            $entityManager = $this->getDoctrine()->getManager();
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getDoctrine()
                 ->getRepository(User::class)
                 ->findOneBy(['email' => $this->getUser()->getUsername()]);
@@ -157,23 +146,19 @@ class ProfileController extends AbstractController
 
             if($image)
             {
-                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
-
                 try {
-                    $image->move(
-                        $this->getParameter('file_save_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
+                    $fileName = $fileUploader->upload($image);
+
+                    $user->setImage($fileName);
+
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+                }
+                catch (FileException $e){
+                    $notifier->send(new Notification('Произошла ошибка при сохранении файла.', ['browser']));
                 }
             }
-            $user->setImage($newFilename);
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
         }
 
         return $this->render('profile/change.html.twig', [

@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/comment')]
 class CommentController extends AbstractController
 {
-    //TODO Контроллеры 3 пункт
     #[Route('/', name: 'comment_index', methods: ['GET'])]
     public function index(CommentRepository $commentRepository): Response
     {
@@ -95,18 +94,6 @@ class CommentController extends AbstractController
                 'productId' => $product->getId(),
             'exist' => true
         ]);
-
-//        if ($comments == null)
-//            return $this->render('comment/show.html.twig', [
-//                'comments' => $comments,
-//                'productId' => $product->getId(),
-//                'exist' => false
-//            ]);
-//        return $this->render('comment/show.html.twig', [
-//            'comments' => $comments,
-//            'productId' => $product->getId(),
-//            'exist' => true
-//        ]);
     }
 
     #[Route('/{id}/edit', name: 'comment_edit', methods: ['GET', 'POST'])]
