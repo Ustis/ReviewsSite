@@ -1,0 +1,15 @@
+framework:
+  messenger:
+    transports:
+      book:
+        dsn: '%env(BOOK_TRANSPORT_DSN)%'
+        options:
+          queue_name: book
+      comment:
+        dsn: '%env(COMMENT_TRANSPORT_DSN1)%'
+        options:
+          queue_name: comment
+
+    routing:
+      'App\Service\Book': book
+      'App\Service\BookComment': comment

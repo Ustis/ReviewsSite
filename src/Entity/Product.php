@@ -39,6 +39,11 @@ class Product
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="string", length=1024, nullable=true)
+     */
+    private $keywords;
+
     public function __construct()
     {
         $this->relation = new ArrayCollection();
@@ -111,6 +116,18 @@ class Product
                 $relation->setRelatedToProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getKeywords(): ?string
+    {
+        return $this->keywords;
+    }
+
+    public function setKeywords(?string $keywords): self
+    {
+        $this->keywords = $keywords;
 
         return $this;
     }

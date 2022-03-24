@@ -39,7 +39,8 @@ class Fixtures extends Fixture implements ContainerAwareInterface
         $rolesUser = array();
         array_push($rolesUser, 'ROLE_USER');
         $user->setRoles($rolesUser);
-
+        $user->setInfo('');
+        $user->setImage('');
 
         $admin = new User();
 
@@ -49,6 +50,8 @@ class Fixtures extends Fixture implements ContainerAwareInterface
         $rolesUser = array();
         array_push($rolesUser, 'ROLE_ADMIN');
         $admin->setRoles($rolesUser);
+        $admin->setInfo('');
+        $admin->setImage('');
 
         $manager->persist($user);
         $manager->persist($admin);
